@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bienestar Sexual — App Educativa</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text-primary: #111111;
+    --text-secondary: #555555;
+    --text-tertiary: #888888;
+    --border: #e0e0e0;
+    --surface-muted: #f5f5f5;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --purple: #7c3aed;
+    --red: #dc2626;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .screen { display: none; animation: fadeIn 0.3s ease-out; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(8px);} to { opacity:1; transform: translateY(0);} }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 16px 28px; font-size: 18px; font-weight: 500;
+    border-radius: 12px; border: 2px solid var(--text-primary);
+    background: var(--text-primary); color: #fff; cursor: pointer;
+    transition: opacity 0.15s; width: 100%;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn-outline { background: transparent; color: var(--text-primary); }
+  .btn-outline:hover { background: var(--surface-muted); }
+  .btn-lg { padding: 18px 32px; font-size: 20px; }
+  .title-xl { font-size: 32px; font-weight: 500; line-height: 1.2; text-align: center; }
+  .title-lg { font-size: 26px; font-weight: 500; line-height: 1.25; }
+  .title-md { font-size: 22px; font-weight: 500; }
+  .text-lg { font-size: 18px; line-height: 1.6; color: var(--text-secondary); }
+  .text-md { font-size: 16px; line-height: 1.6; color: var(--text-secondary); }
+  .text-sm { font-size: 14px; line-height: 1.5; color: var(--text-tertiary); }
+  .center { text-align: center; }
+  .mt-1 { margin-top: 8px; }
+  .mt-2 { margin-top: 16px; }
+  .mt-3 { margin-top: 24px; }
+  .mb-1 { margin-bottom: 8px; }
+  .mb-2 { margin-bottom: 16px; }
+  .p-2 { padding: 16px; }
+  .card {
+    border: 1.5px solid var(--border); border-radius: 14px; padding: 20px;
+    background: transparent;
+  }
+  .card-hover { cursor: pointer; transition: all 0.15s; }
+  .card-hover:hover { border-color: var(--text-primary); background: var(--surface-muted); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .flex-col { display: flex; flex-direction: column; gap: 12px; }
+  .icon-xl { width: 64px; height: 64px; color: var(--text-primary); }
+  .icon-lg { width: 40px; height: 40px; color: var(--text-primary); }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 16px; font-size: 16px; font-weight: 500;
+    color: var(--text-secondary); background: none; border: none; cursor: pointer; margin-bottom: 12px;
+  }
+  .back-btn:hover { color: var(--text-primary); }
+  .quiz-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px; border: 1.5px solid var(--border); border-radius: 12px;
+    cursor: pointer; font-size: 18px; color: var(--text-primary);
+    transition: all 0.15s;
+  }
+  .quiz-option:hover { border-color: var(--text-primary); background: var(--surface-muted); }
+  .quiz-option.selected { border-color: var(--green); background: rgba(22,163,74,0.08); }
+  .tag { display: inline-block; padding: 4px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+  .tag-green { background: rgba(22,163,74,0.12); color: var(--green); }
+  .tag-blue { background: rgba(37,99,235,0.12); color: var(--blue); }
+  .tag-purple { background: rgba(124,58,237,0.12); color: var(--purple); }
+  .tag-red { background: rgba(220,38,38,0.12); color: var(--red); }
+  .tag-gray { background: var(--surface-muted); color: var(--text-secondary); }
+  .progress-dots { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+  .dot.active { background: var(--text-primary); }
+  .contact-card { border: 2px solid var(--border); border-radius: 16px; padding: 28px; text-align: center; }
+  .phone-big { font-size: 28px; font-weight: 500; color: var(--text-primary); margin-top: 12px; }
+  @media (max-width: 480px) {
+    .title-xl { font-size: 26px; }
+    .title-lg { font-size: 22px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .btn-lg { font-size: 18px; padding: 16px 24px; }
+  }
+</style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- PANTALLA 1: BIENVENIDA -->
+<div id="screen-welcome" class="screen active p-2">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:420px;gap:20px;">
+    <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <div class="title-xl">Bienestar Sexual</div>
+    <div class="text-lg center" style="max-width:360px;">Un espacio seguro y privado para aprender sobre sexualidad, identidad y relaciones de pareja.</div>
+    <div class="text-sm center">Contenido educativo · Sin registro · 100% anónimo</div>
+    <div style="width:100%;max-width:320px;margin-top:8px;">
+      <button class="btn btn-lg" onclick="goTo('menu')">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Comenzar
+      </button>
+    </div>
+    <div class="text-sm center" style="margin-top:8px;">Para mayores de 18 años</div>
+  </div>
+</div>
+
+<!-- PANTALLA 2: MENÚ PRINCIPAL -->
+<div id="screen-menu" class="screen p-2">
+  <div class="title-lg mb-2 center">¿Qué quieres aprender hoy?</div>
+  <div class="text-md center mb-2">Elige un tema para comenzar tu recorrido educativo.</div>
+  <div class="grid-2">
+    <div class="card card-hover" onclick="openModule(0)">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <div class="title-md mt-1">Anatomía y fisiología</div>
+      <div class="text-md mt-1">Conoce tu cuerpo sin tabúes ni vergüenza.</div>
+      <span class="tag tag-green" style="margin-top:10px;">Nivel 1</span>
+    </div>
+    <div class="card card-hover" onclick="openModule(1)">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div class="title-md mt-1">Consentimiento</div>
+      <div class="text-md mt-1">Aprende a poner límites y respetar los del otro.</div>
+      <span class="tag tag-green" style="margin-top:10px;">Nivel 1</span>
+    </div>
+    <div class="card card-hover" onclick="openModule(2)">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <div class="title-md mt-1">Género e identidad</div>
+      <div class="text-md mt-1">Entiende la diferencia entre sexo, género y orientación.</div>
+      <span class="tag tag-blue" style="margin-top:10px;">Nivel 2</span>
+    </div>
+    <div class="card card-hover" onclick="openModule(3)">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div class="title-md mt-1">Comunicación de pareja</div>
+      <div class="text-md mt-1">Cómo hablar de deseos, miedos y expectativas.</div>
+      <span class="tag tag-blue" style="margin-top:10px;">Nivel 2</span>
+    </div>
+    <div class="card card-hover" onclick="openModule(4)">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      <div class="title-md mt-1">Salud sexual</div>
+      <div class="text-md mt-1">ITS, anticonceptivos y chequeos médicos.</div>
+      <span class="tag tag-purple" style="margin-top:10px;">Nivel 3</span>
+    </div>
+    <div class="card card-hover" onclick="goTo('contact')" style="border-color:rgba(220,38,38,0.3);">
+      <svg class="icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--red)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <div class="title-md mt-1" style="color:var(--red)">Hablar con un especialista</div>
+      <div class="text-md mt-1">¿Necesitas ayuda personalizada? Contacta al profesional.</div>
+      <span class="tag tag-red" style="margin-top:10px;">Derivación</span>
+    </div>
+  </div>
+</div>
+
+<!-- PANTALLA 3: MÓDULO -->
+<div id="screen-module" class="screen p-2">
+  <button class="back-btn" onclick="goTo('menu')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    Volver al menú
+  </button>
+  <div id="module-content"></div>
+  <div class="mt-3">
+    <button class="btn" onclick="startQuiz()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Hacer autoevaluación
+    </button>
+  </div>
+</div>
+
+<!-- PANTALLA 4: QUIZ -->
+<div id="screen-quiz" class="screen p-2">
+  <button class="back-btn" onclick="goTo('menu')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    Volver
+  </button>
+  <div id="quiz-content"></div>
+  <div class="progress-dots" id="quiz-dots"></div>
+</div>
+
+<!-- PANTALLA 5: RESULTADO QUIZ -->
+<div id="screen-result" class="screen p-2">
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px;gap:16px;">
+    <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <div class="title-xl">¡Buen trabajo!</div>
+    <div class="text-lg center" id="result-text"></div>
+    <div style="width:100%;max-width:320px;" class="flex-col">
+      <button class="btn" onclick="goTo('menu')">Seguir aprendiendo</button>
+      <button class="btn btn-outline" onclick="goTo('contact')">Hablar con especialista</button>
+    </div>
+  </div>
+</div>
+
+<!-- PANTALLA 6: CONTACTO PROFESIONAL -->
+<div id="screen-contact" class="screen p-2">
+  <button class="back-btn" onclick="goTo('menu')">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    Volver al menú
+  </button>
+  <div class="contact-card">
+    <svg class="icon-xl" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <div class="title-lg mt-2">Adrián Ruggeri</div>
+    <div class="text-lg mt-1">Máster en Sexología y Coach de Relaciones Afectivas</div>
+    <div class="text-md mt-1" style="color:var(--text-tertiary)">Argentina</div>
+    <div class="phone-big">+54 9 362 470-8675</div>
+    <div class="mt-2" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+      <span class="tag tag-green">Sexología clínica</span>
+      <span class="tag tag-blue">Coaching de parejas</span>
+      <span class="tag tag-purple">Educación sexual</span>
+    </div>
+  </div>
+  <div class="card mt-2">
+    <div class="title-md mb-1">¿Cuándo consultar?</div>
+    <div class="text-md">Si experimentas disfunciones sexuales persistentes, traumas no resueltos, inseguridad severa que afecta tu relación, o simplemente necesitas orientación personalizada. La primera consulta es de evaluación, sin compromiso. Atención presencial y online.</div>
+  </div>
+  <div class="mt-2">
+    <button class="btn btn-outline" onclick="goTo('menu')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Volver al inicio
+    </button>
+  </div>
+</div>
+
+<script>
+const modules = [
+  {
+    title: "Anatomía y fisiología sexual",
+    level: "Nivel 1",
+    tagClass: "tag-green",
+    content: `
+      <div class="title-lg mb-2">Anatomía y fisiología sexual</div>
+      <div class="text-lg mb-2">Conocer tu cuerpo es el primer paso hacia una sexualidad saludable. No hay nada de qué avergonzarse.</div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">¿Qué es la anatomía sexual?</div>
+        <div class="text-md">Son las partes del cuerpo que participan en la reproducción y el placer. En personas con vulva: vulva, vagina, clítoris, útero y ovarios. En personas con pene: pene, escroto, testículos y próstata. Todos estos órganos son normales y saludables.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">El ciclo de respuesta sexual</div>
+        <div class="text-md">Masters y Johnson describieron cuatro fases: excitación, meseta, orgasmo y resolución. Es un proceso natural que ocurre en todos los cuerpos, aunque con diferentes ritmos y sensaciones.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Dato importante</div>
+        <div class="text-md">El clítoris es el único órgano cuya función exclusiva es proporcionar placer. Tiene más de 8.000 terminaciones nerviosas. Conocerlo y respetarlo es fundamental.</div>
+      </div>
+    `
+  },
+  {
+    title: "Consentimiento y límites",
+    level: "Nivel 1",
+    tagClass: "tag-green",
+    content: `
+      <div class="title-lg mb-2">Consentimiento y límites</div>
+      <div class="text-lg mb-2">El consentimiento es la base de toda relación sexual saludable. Sin él, no hay intimidad genuina.</div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Regla FRIES</div>
+        <div class="text-md"><b>Freely given</b> — libre, sin presión.<br><b>Reversible</b> — puedes cambiar de opinión en cualquier momento.<br><b>Informed</b> — con información completa.<br><b>Enthusiastic</b> — entusiasta, no pasivo.<br><b>Specific</b> — específico para cada acto.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Cómo decir "no"</div>
+        <div class="text-md">"No estoy lista", "Prefiero esperar", "No me siento cómodo/a", "Quiero detenernos". Tu cuerpo te pertenece y nadie tiene derecho a ignorar tus límites. Un "no" completo no necesita explicación.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Señales de alerta</div>
+        <div class="text-md">Presión emocional, chantaje, manipulación con alcohol o drogas, ignorar un "no" o un "tal vez", avanzar sin preguntar. Si algo no se siente bien, probablemente no lo es.</div>
+      </div>
+    `
+  },
+  {
+    title: "Género e identidad",
+    level: "Nivel 2",
+    tagClass: "tag-blue",
+    content: `
+      <div class="title-lg mb-2">Género e identidad</div>
+      <div class="text-lg mb-2">Entender la diferencia entre sexo biológico, identidad de género y orientación sexual es clave para respetarnos a nosotros mismos y a los demás.</div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Sexo biológico</div>
+        <div class="text-md">Se refiere a las características corporales: cromosomas, hormonas, genitales. No siempre es binario: existen variaciones intersexuales naturales.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Identidad de género</div>
+        <div class="text-md">Es quién eres por dentro. Puedes ser hombre, mujer, ambos, ninguno, o fluir entre ellos. Puede coincidir o no con el sexo asignado al nacer.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Orientación sexual</div>
+        <div class="text-md">Es hacia quién te atraes emocional, romántica o sexualmente. Heterosexual, homosexual, bisexual, pansexual, asexual... todas son formas válidas de ser humano.</div>
+      </div>
+    `
+  },
+  {
+    title: "Comunicación de pareja",
+    level: "Nivel 2",
+    tagClass: "tag-blue",
+    content: `
+      <div class="title-lg mb-2">Comunicación de pareja</div>
+      <div class="text-lg mb-2">Hablar de sexo con la pareja puede generar nerviosismo, pero la comunicación abierta mejora la intimidad y el placer mutuo.</div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">El momento correcto</div>
+        <div class="text-md">Habla fuera del momento sexual, en un ambiente relajado. Usa frases en primera persona: "Me gusta cuando...", "Me gustaría probar...", "No me siento cómodo/a con...".</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Escucha activa</div>
+        <div class="text-md">Cuando tu pareja comparte algo, escucha sin juzgar ni interrumpir. Valida sus sentimientos: "Entiendo que te sientas así" genera confianza.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Fantasías y límites</div>
+        <div class="text-md">Compartir fantasías es normal y sano. No todas deben cumplirse. Lo importante es que ambas partes se sientan seguras y respetadas.</div>
+      </div>
+    `
+  },
+  {
+    title: "Salud sexual",
+    level: "Nivel 3",
+    tagClass: "tag-purple",
+    content: `
+      <div class="title-lg mb-2">Salud sexual</div>
+      <div class="text-lg mb-2">Cuidar tu salud sexual es cuidar tu bienestar general. La información correcta te protege y empodera.</div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Infecciones de transmisión sexual (ITS)</div>
+        <div class="text-md">VIH, sífilis, gonorrea, clamidia, herpes, VPH... muchas ITS no presentan síntomas. El uso de barreras (condón, barrera dental) y los chequeos regulares son la mejor protección.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Anticonceptivos</div>
+        <div class="text-md">Existen múltiples métodos: condón, píldora, DIU, implante, parche, anillo vaginal, inyección. Ninguno es perfecto. Habla con un médico para elegir el más adecuado para ti.</div>
+      </div>
+      <div class="card mb-2">
+        <div class="title-md mb-1">Chequeos médicos</div>
+        <div class="text-md">Un control ginecológico o urológico anual es recomendable. No esperes a tener síntomas. La prevención salva vidas.</div>
+      </div>
+    `
+  }
+];
+
+const quizzes = [
+  { question: "¿Cuál es la función exclusiva del clítoris?", options: ["Reproducción", "Proporcionar placer", "Producción de hormonas", "Proteger la vagina"], correct: 1 },
+  { question: "¿Qué significa que el consentimiento sea 'reversible'?", options: ["Que solo aplica una vez", "Que puede retirarse en cualquier momento", "Que dura 24 horas", "Que necesita un contrato"], correct: 1 },
+  { question: "La identidad de género se refiere a...", options: ["Los cromosomas de una persona", "Quién eres por dentro", "La orientación sexual", "Los genitales"], correct: 1 },
+  { question: "¿Cuándo es mejor hablar de sexo con la pareja?", options: ["Durante la relación sexual", "En un momento relajado, fuera del acto", "Nunca, es incómodo", "Solo si hay problemas"], correct: 1 },
+  { question: "¿Qué método anticonceptivo también protege contra ITS?", options: ["La píldora", "El DIU", "El condón", "El implante"], correct: 2 }
+];
+
+let currentModule = 0;
+let currentQuestion = 0;
+let score = 0;
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screenId).classList.add('active');
+}
+
+function openModule(idx) {
+  currentModule = idx;
+  document.getElementById('module-content').innerHTML = modules[idx].content;
+  goTo('module');
+}
+
+function startQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  renderQuestion();
+  goTo('quiz');
+}
+
+function renderQuestion() {
+  const q = quizzes[currentQuestion];
+  let html = '<div class="title-lg mb-2">Autoevaluación</div>';
+  html += '<div class="text-lg mb-2">Pregunta ' + (currentQuestion + 1) + ' de ' + quizzes.length + '</div>';
+  html += '<div class="card mb-2"><div class="title-md mb-2">' + q.question + '</div></div>';
+  html += '<div class="flex-col">';
+  q.options.forEach((opt, i) => {
+    html += '<div class="quiz-option" onclick="selectOption(' + i + ', this)">' + opt + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('quiz-content').innerHTML = html;
+  renderDots();
+}
+
+function renderDots() {
+  let html = '';
+  for (let i = 0; i < quizzes.length; i++) {
+    html += '<div class="dot ' + (i === currentQuestion ? 'active' : '') + '"></div>';
+  }
+  document.getElementById('quiz-dots').innerHTML = html;
+}
+
+function selectOption(idx, el) {
+  document.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  if (idx === quizzes[currentQuestion].correct) score++;
+  setTimeout(() => {
+    currentQuestion++;
+    if (currentQuestion < quizzes.length) {
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }, 600);
+}
+
+function showResult() {
+  const pct = Math.round((score / quizzes.length) * 100);
+  let msg = '';
+  if (pct >= 80) msg = 'Obtuviste ' + pct + '%. Tienes una excelente base de conocimientos. ¡Sigue explorando los temas avanzados!';
+  else if (pct >= 50) msg = 'Obtuviste ' + pct + '%. Vas por buen camino. Revisa los módulos donde tuviste dudas para reforzar tus conocimientos.';
+  else msg = 'Obtuviste ' + pct + '%. No te preocupes, el aprendizaje es un proceso. Te recomendamos repasar los módulos de nivel 1.';
+  document.getElementById('result-text').textContent = msg;
+  goTo('result');
+}
+</script>
+</body>
+</html>
